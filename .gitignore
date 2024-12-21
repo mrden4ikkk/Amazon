@@ -1,3 +1,4 @@
 .DS_Store
 Terraform/.terraform*
 Terraform/terraform*
+/ToolBox/terraform/.terraform
