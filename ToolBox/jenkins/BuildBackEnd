@@ -1,0 +1,43 @@
+#!groovy
+//  groovy Jenkinsfile
+pipeline  {
+    agent any;
+    stages {
+       stage("Change IP in appsettings.json")
+         {
+             steps{
+                sh "find BackEnd/Amazon-clone/ -type f -exec sed  -i 's#http://localhost:81#https://51.21.128.141/#g' {} +"
+             }
+         }
+        stage("Change Database IP in appsettings.json")
+         {
+             steps{
+                sh "find BackEnd/Amazon-clone/ -type f -exec sed  -i 's#Server=20.240.61.200#Server=51.21.128.141#g' {} +"
+             }
+         }
+        stage("Create backend docker image") {
+            steps {
+                echo 'Creating backend docker image ...'
+                sh " cd BackEnd/Amazon-clone/ && docker build --no-cache -t macnaer/amazon-clone-backend  . "
+            }
+        }
+        stage("docker login") {
+            steps {
+                echo " ============== docker login =================="
+                withCredentials([usernamePassword(credentialsId: 'DockerHub-Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh '''
+                    docker login -u $USERNAME -p $PASSWORD
+                    '''
+                }
+            }
+        }
+        stage("docker frontend push") {
+            steps {
+                echo " ============== pushing amazon-clone-backend image =================="
+                sh '''
+                docker push  macnaer/amazon-clone-backend
+                '''
+            }
+        }
+    }
+}

@@ -1,0 +1,37 @@
+#!groovy
+//  groovy Jenkinsfile
+pipeline  {
+    agent any;
+    stages {
+        stage("Change IP in axios.js")
+         {
+             steps{
+                sh "find FrontEnd/my-app/ -type f -exec sed  -i 's#http://localhost:5034#http://51.21.128.141:5034#g' {} +"
+             }
+         }
+        stage("Create frontend docker image") {
+            steps {
+                echo 'Creating frontend docker image ...'
+                sh "cd FrontEnd/my-app &&  docker build --no-cache -t macnaer/amazon-clone-frontend   . "                
+            }
+        }
+        stage("docker login") {
+            steps {
+                echo " ============== docker login =================="
+                withCredentials([usernamePassword(credentialsId: 'DockerHub-Credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh '''
+                    docker login -u $USERNAME -p $PASSWORD
+                    '''
+                }
+            }
+        }
+        stage("docker frontend push") {
+            steps {
+                echo " ============== pushing amazon-clone-frontend image =================="
+                sh '''
+                docker push macnaer/amazon-clone-frontend
+                '''
+            }
+        }
+    }
+}

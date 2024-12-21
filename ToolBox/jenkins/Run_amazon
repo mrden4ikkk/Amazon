@@ -1,0 +1,42 @@
+#!groovy
+//  groovy Jenkinsfile
+pipeline  {
+    agent any;
+    stages {
+         stage ("Remove all containers and images"){
+             steps{
+               sh'''#!/bin/sh 
+            bash ToolBox/bash/delete.sh -y
+ '''
+             }
+        }
+         stage ("Remove docker cache"){
+         steps{
+            sh "docker system prune -af"
+         }   
+        }
+         stage ("Run MSSQL container"){
+            steps{
+                  withCredentials([string(credentialsId: 'MSSQL-PASSWORD',  variable: 'PASSWD')]){
+                sh 'docker run  --restart=always -v /opt/mssql:/var/opt/mssql -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=$PASSWD" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest'
+                  }
+            }
+        }
+         stage("docker frontend run") {
+             steps {
+                 echo " ============== Creating frontend docker container =================="
+                 sh '''
+                 docker run -d --restart=always -p 80:80 --name=frontend macnaer/amazon-clone-frontend
+                 '''
+             }
+         }
+        stage("docker backend run") {
+             steps {
+                 echo " ============== Creating backend docker container =================="
+                 sh '''
+                 docker run -d --restart=always -p 5034:5034 --name=backend macnaer/amazon-clone-backend
+                 '''
+             }
+        }
+    }
+}
