@@ -73,16 +73,8 @@ resource "aws_security_group_rule" "egress_rule" {
   security_group_id = aws_security_group.DefaultTerraformSG.id
 }
 
-
-// Print IPs info
-output "jenkins_public_ip" {
-  value       = aws_instance.EC2-Instance.public_ip
-  description = "The public IP address of the Jenkins EC2 instance"
-}
-
 resource "null_resource" "print_ip" {
   provisioner "local-exec" {
-    command = "echo Jenkins Public IP: ${aws_instance.EC2-Instance.public_ip}"
+    command = "echo Jenkins Public IP: ${aws_eip_association.eip_assoc.public_ip}"
   }
-  depends_on = [aws_instance.EC2-Instance]
 }
