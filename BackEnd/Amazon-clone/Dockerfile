@@ -7,7 +7,7 @@ RUN dotnet restore "ShopApi/ShopApi.csproj"
 
 
 # Install the dotnet-ef tool locally
-RUN dotnet tool install -g dotnet-ef  --version 6.0.6
+RUN dotnet tool install -g dotnet-ef  --version 6.0.20
 ENV PATH $PATH:/root/.dotnet/tools
 RUN dotnet-ef database update --startup-project "ShopApi" --project "DAL/DAL.csproj"
 # Publish the application
