@@ -12,7 +12,7 @@ pipeline  {
         stage("Create frontend docker image") {
             steps {
                 echo 'Creating frontend docker image ...'
-                sh "cd FrontEnd/my-app &&  docker build --no-cache -t macnaer/amazon-clone-frontend   . "                
+                sh "cd FrontEnd/my-app &&  docker build --no-cache -t den4ikk/amazon-clone-frontend   . "                
             }
         }
         stage("docker login") {
@@ -29,7 +29,7 @@ pipeline  {
             steps {
                 echo " ============== pushing amazon-clone-frontend image =================="
                 sh '''
-                docker push macnaer/amazon-clone-frontend
+                docker push den4ikk/amazon-clone-frontend
                 '''
             }
         }
