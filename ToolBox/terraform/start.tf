@@ -10,7 +10,7 @@ resource "aws_instance" "EC2-Instance" {
   availability_zone      = "eu-north-1a"
   ami                    = "ami-08eb150f611ca277f"
   instance_type          = "t3.medium"
-  key_name               = "var.kay_name"
+  key_name               = "var.key_name"
   vpc_security_group_ids = [aws_security_group.DefaultTerraformSG.id]
 
   // Create main disk
