@@ -17,3 +17,8 @@ variable "public_ip" {
   type    = string
   default = ""
 }
+
+variable "key_name" {
+  type    = string
+  default = "MyKey"
+}
