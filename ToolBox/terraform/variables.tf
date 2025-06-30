@@ -13,10 +13,10 @@ variable "region" {
   default = "eu-north-1"
 }
 
-variable "public_ip" {
-  type    = string
-  default = ""
-}
+#variable "public_ip" {
+#  type    = string
+#  default = ""
+#}
 
 variable "key_name" {
   type    = string
