@@ -30,11 +30,19 @@ resource "aws_instance" "EC2-Instance" {
   user_data = file("files/install_apps.sh")
 }
 
+resource "aws_eip" "jenkins_eip" {
+  vpc = true
+}
 
 resource "aws_eip_association" "eip_assoc" {
   instance_id   = aws_instance.EC2-Instance.id
-  allocation_id = var.public_ip
+  allocation_id = aws_eip.jenkins_eip.id
 }
+
+#resource "aws_eip_association" "eip_assoc" {
+#  instance_id   = aws_instance.EC2-Instance.id
+#  allocation_id = var.public_ip
+#}
 
 
 // Create security group
