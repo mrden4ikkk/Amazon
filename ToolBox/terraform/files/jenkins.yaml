@@ -1,3 +1,27 @@
+plugins:
+  required:
+    - id: configuration-as-code
+    - id: cloudbees-folder
+    - id: antisamy-markup-formatter
+    - id: build-timeout
+    - id: credentials-binding
+    - id: timestamper
+    - id: ws-cleanup
+    - id: ant
+    - id: gradle
+    - id: workflow-aggregator
+    - id: github-branch-source
+    - id: pipeline-github-lib
+    - id: pipeline-stage-view
+    - id: git
+    - id: git-client
+    - id: ssh-slaves
+    - id: matrix-auth
+    - id: pam-auth
+    - id: ldap
+    - id: email-ext
+    - id: mailer
+
 credentials:
   system:
     domainCredentials:
@@ -98,28 +122,6 @@ security:
   scriptApproval:
     forceSandbox: false
 unclassified:
-  pluginManager:
-    plugins:
-      - cloudbees-folder
-      - antisamy-markup-formatter
-      - build-timeout
-      - credentials-binding
-      - timestamper
-      - ws-cleanup
-      - ant
-      - gradle
-      - workflow-aggregator
-      - github-branch-source
-      - pipeline-github-lib
-      - pipeline-stage-view
-      - git
-      - git-client
-      - ssh-slaves
-      - matrix-auth
-      - pam-auth
-      - ldap
-      - email-ext
-      - mailer
 
   buildDiscarders:
     configuredBuildDiscarders:
