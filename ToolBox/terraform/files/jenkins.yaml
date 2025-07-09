@@ -201,6 +201,7 @@ tool:
     settingsProvider: "standard"
 
 
+<<<<<<< HEAD
 jobs:
   - script: >
       pipelineJob('BuildBackEnd') {
@@ -270,3 +271,92 @@ jobs:
         }
       }
 
+=======
+  jobs:
+    - script: >
+        pipelineJob('RunMSSQL') {
+          definition {
+            cps {
+              script("""
+                pipeline {
+                  agent any
+                  environment {
+                    MSSQL_PASS = credentials('MSSQL-PASSWORD')
+                    DB_HOST = credentials('IP_ADDRESS')
+                  }
+                  stages {
+                    stage('Run MSSQL') {
+                      steps {
+                        echo "Connecting to MSSQL at \$DB_HOST"
+                        sh "echo MSSQL Password: \$MSSQL_PASS"
+                        // Тут може бути docker run або sqlcmd
+                      }
+                    }
+                  }
+                }
+              """)
+              sandbox()
+            }
+          }
+        }
+
+    - script: >
+        pipelineJob('BuildBackEnd') {
+          definition {
+            cpsScm {
+              scm {
+                git {
+                  remote {
+                    url('https://github.com/mrden4ikkk/backend.git')
+                  }
+                  branches('*/main')
+                }
+              }
+              scriptPath('Jenkinsfile')
+            }
+          }
+        }
+
+    - script: >
+        pipelineJob('BuildFrontEnd') {
+          definition {
+            cpsScm {
+              scm {
+                git {
+                  remote {
+                    url('https://github.com/mrden4ikkk/frontend.git')
+                  }
+                  branches('*/main')
+                }
+              }
+              scriptPath('Jenkinsfile')
+            }
+          }
+        }
+
+    - script: >
+        pipelineJob('Run_amazon') {
+          definition {
+            cps {
+              script("""
+                pipeline {
+                  agent any
+                  environment {
+                    AWS_KEY = credentials('AWS_ACCESS_KEY_ID')
+                    AWS_SECRET = credentials('AWS_SECRET_ACCESS_KEY')
+                  }
+                  stages {
+                    stage('Deploy Amazon Infra') {
+                      steps {
+                        sh 'terraform init'
+                        sh 'terraform apply -auto-approve'
+                      }
+                    }
+                  }
+                }
+              """)
+              sandbox()
+            }
+          }
+        }
+>>>>>>> 3b04bba (Initial commit)

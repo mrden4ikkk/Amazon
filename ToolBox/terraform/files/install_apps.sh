@@ -40,7 +40,7 @@ sudo mkdir /opt/mssql
 sudo chmod 777 /opt/mssql
 ########################################################
 ###################Unlock Jenkins###########################
-url="http://51.20.61.242:8080"
+url="http://56.228.77.251:8080"
 password=$(sudo cat /var/lib/jenkins/secrets/initialAdminPassword)
 
 echo $password
@@ -72,7 +72,7 @@ sudo systemctl restart jenkins
 #################################################
 ################################# Suggested Plugins ############################################
 #! /bin/bash
-url=http://51.20.61.242:8080
+url="http://56.228.77.251:8080"
 
 
 cookie_jar="$(mktemp)"
@@ -101,11 +101,11 @@ sudo systemctl restart jenkins
 
 # The jenkins URL, if you are on an amazon instance, you can put there the
 # public DNS name, in order to be able to access jenkins thorugh that URL
-url=http://51.20.61.242:8080
+url="http://56.228.77.251:8080"
 
 user=user
 password=password
-url_urlEncoded=$(python -c "import urllib;print urllib.quote(raw_input(), safe='')" <<< "$url")
+url_urlEncoded=$(python3 -c "import urllib;print urllib.quote(raw_input(), safe='')" <<< "$url")
 
 cookie_jar="$(mktemp)"
 full_crumb=$(curl -u "$username:$new_password" --cookie-jar "$cookie_jar" $url/crumbIssuer/api/xml?xpath=concat\(//crumbRequestField,%22:%22,//crumb\))
@@ -122,5 +122,10 @@ curl -X POST -u "$username:$new_password" $url/setupWizard/configureInstance \
   --cookie $cookie_jar \
   --data-raw "rootUrl=$url_urlEncoded%2F&Jenkins-Crumb=$only_crumb&json=%7B%22rootUrl%22%3A%20%22$url_urlEncoded%2F%22%2C%20%22Jenkins-Crumb%22%3A%20%22$only_crumb%22%7D&core%3Aapply=&Submit=Save&json=%7B%22rootUrl%22%3A%20%22$url_urlEncoded%2F%22%2C%20%22Jenkins-Crumb%22%3A%20%22$only_crumb%22%7D"
 ############################################################################################
+
+sudo bash -c 'echo current > /var/lib/jenkins/jenkins.install.InstallUtil.lastExecVersion'
+sudo bash -c 'echo current > /var/lib/jenkins/jenkins.install.UpgradeWizard.state'
+sudo chown jenkins:jenkins /var/lib/jenkins/jenkins.install.*
+
 
 sudo systemctl restart jenkins

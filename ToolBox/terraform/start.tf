@@ -10,7 +10,11 @@ resource "aws_instance" "EC2-Instance" {
   availability_zone      = "eu-north-1a"
   ami                    = "ami-08eb150f611ca277f"
   instance_type          = "t3.medium"
-  key_name               = "var.key_name"
+
+  key_name               = var.key_name
+
+#  key_name               = "MyKey"
+
   vpc_security_group_ids = [aws_security_group.DefaultTerraformSG.id]
 
   // Create main disk
@@ -30,17 +34,35 @@ resource "aws_instance" "EC2-Instance" {
   user_data = file("files/install_apps.sh")
 }
 
-resource "aws_eip" "jenkins_eip" {
-  vpc = true
-}
 
-resource "aws_eip_association" "eip_assoc" {
-  instance_id   = aws_instance.EC2-Instance.id
-  allocation_id = aws_eip.jenkins_eip.id
+resource "aws_eip" "jenkins_eip" {
+  domain = "vpc"
 }
 
 #resource "aws_eip_association" "eip_assoc" {
 #  instance_id   = aws_instance.EC2-Instance.id
+#  allocation_id = aws_eip.jenkins_eip.id
+#}
+
+#resource "aws_eip" "jenkins_eip" {
+#  domain = "vpc"
+#}
+
+resource "aws_eip_association" "eip_assoc" {
+  instance_id   = aws_instance.EC2-Instance.id
+  allocation_id = var.elastic_ip_allocation_id
+}
+
+#resource "aws_eip_association" "eip_assoc" {
+#  instance_id   = aws_instance.EC2-Instance.id
+
+
+#  allocation_id = aws_eip.jenkins_eip.id
+#}
+
+#resource "aws_eip_association" "eip_assoc" {
+#  instance_id   = aws_instance.EC2-Instance.id
+
 #  allocation_id = var.public_ip
 #}
 

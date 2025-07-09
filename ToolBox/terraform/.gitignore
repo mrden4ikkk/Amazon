@@ -1,0 +1,15 @@
+# Не відстежувати файли з секретами
+terraform.tfvars
+
+# Файли стану Terraform (не можна заливати у git)
+*.tfstate
+*.tfstate.backup
+
+# Локальна папка Terraform
+.terraform/
+
+# Логи збоїв
+crash.log
+
+# Кеші або тимчасові файли
+*.log
