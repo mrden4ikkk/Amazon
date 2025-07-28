@@ -13,3 +13,6 @@ crash.log
 
 # Кеші або тимчасові файли
 *.log
+
+# Архіви Jenkins або інші .tar.gz
+*.tar.gz
