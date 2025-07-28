@@ -11,7 +11,7 @@ if [ ! -d "$JENKINS_HOME" ]; then
 fi
 
 # === Архівування ===
-echo "📦 Створення архіву з: $JENKINS_HOME"
+echo "Створення архіву з: $JENKINS_HOME"
 tar -czvf "$ARCHIVE_NAME" -C "$JENKINS_HOME" .
 
-echo "✅ Архів збережено як: $ARCHIVE_NAME"
+echo "Архів збережено як: $ARCHIVE_NAME"
