@@ -40,7 +40,7 @@ sudo mkdir /opt/mssql
 sudo chmod 777 /opt/mssql
 ########################################################
 ###################Unlock Jenkins###########################
-url="http://16.170.153.174:8080"
+url="http://13.61.41.237:8080"
 password=$(sudo cat /var/lib/jenkins/secrets/initialAdminPassword)
 
 echo $password
@@ -72,7 +72,7 @@ sudo systemctl restart jenkins
 #################################################
 ################################# Suggested Plugins ############################################
 #! /bin/bash
-url="http://16.170.153.174:8080"
+url="http://13.61.41.237:8080"
 
 
 cookie_jar="$(mktemp)"
@@ -101,7 +101,7 @@ sudo systemctl restart jenkins
 
 # The jenkins URL, if you are on an amazon instance, you can put there the
 # public DNS name, in order to be able to access jenkins thorugh that URL
-url="http://16.170.153.174:8080"
+url="http://13.61.41.237:8080"
 
 user=user
 password=password

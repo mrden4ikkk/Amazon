@@ -5,15 +5,12 @@ provider "aws" {
   secret_key = var.aws_secret_key
 }
 
-// Create ec2 instance
+// Create EC2 instance
 resource "aws_instance" "EC2-Instance" {
   availability_zone      = "eu-north-1a"
   ami                    = "ami-08eb150f611ca277f"
   instance_type          = "t3.medium"
-
   key_name               = var.key_name
-
-#  key_name               = "MyKey"
 
   vpc_security_group_ids = [aws_security_group.DefaultTerraformSG.id]
 
@@ -30,42 +27,18 @@ resource "aws_instance" "EC2-Instance" {
     Name = "Jenkins"
   }
 
-  // User script
   user_data = file("files/install_apps.sh")
 }
 
-
+// Create Elastic IP
 resource "aws_eip" "jenkins_eip" {
   domain = "vpc"
 }
-
-#resource "aws_eip_association" "eip_assoc" {
-#  instance_id   = aws_instance.EC2-Instance.id
-#  allocation_id = aws_eip.jenkins_eip.id
-#}
-
-#resource "aws_eip" "jenkins_eip" {
-#  domain = "vpc"
-#}
 
 resource "aws_eip_association" "eip_assoc" {
   instance_id   = aws_instance.EC2-Instance.id
   allocation_id = var.elastic_ip_allocation_id
 }
-
-#resource "aws_eip_association" "eip_assoc" {
-#  instance_id   = aws_instance.EC2-Instance.id
-
-
-#  allocation_id = aws_eip.jenkins_eip.id
-#}
-
-#resource "aws_eip_association" "eip_assoc" {
-#  instance_id   = aws_instance.EC2-Instance.id
-
-#  allocation_id = var.public_ip
-#}
-
 
 // Create security group
 resource "aws_security_group" "DefaultTerraformSG" {
@@ -103,8 +76,56 @@ resource "aws_security_group_rule" "egress_rule" {
   security_group_id = aws_security_group.DefaultTerraformSG.id
 }
 
+// Print public IP
 resource "null_resource" "print_ip" {
   provisioner "local-exec" {
     command = "echo Jenkins Public IP: ${aws_eip_association.eip_assoc.public_ip}"
+  }
+}
+
+// Create S3 bucket for Jenkins backup
+resource "aws_s3_bucket" "jenkins_backup" {
+  bucket        = "jenkins-backup-den-2025"
+  force_destroy = true
+
+  tags = {
+    Name        = "Jenkins Backup Bucket"
+    Environment = "DiplomaProject"
+  }
+}
+
+// Block public access to S3 bucket (recommended)
+resource "aws_s3_bucket_public_access_block" "block_s3_public" {
+  bucket = aws_s3_bucket.jenkins_backup.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+// Enable versioning (optional but useful)
+resource "aws_s3_bucket_versioning" "jenkins_backup_versioning" {
+  bucket = aws_s3_bucket.jenkins_backup.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+###############
+
+resource "null_resource" "upload_jenkins_backup" {
+  triggers = {
+    archive_path = "${path.module}/jenkins_pipelines.tar.gz"
+    timestamp    = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = <<EOT
+      echo "Uploading Jenkins backup to S3..."
+      aws s3 cp ${path.module}/jenkins_pipelines.tar.gz \
+      s3://jenkins-backup-den-2025/jenkins_pipelines_${timestamp()}.tar.gz
+    EOT
   }
 }
