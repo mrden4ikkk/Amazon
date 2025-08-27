@@ -6,7 +6,7 @@ pipeline  {
         stage("Change IP in axios.js")
          {
              steps{
-                sh "find FrontEnd/my-app/ -type f -exec sed  -i 's#http://localhost:5034#http://13.50.2.169:5034#g' {} +"
+                sh "find FrontEnd/my-app/ -type f -exec sed  -i 's#http://localhost:5034#http://172.20.10.3:5034#g' {} +"
              }
          }
         stage("Create frontend docker image") {
