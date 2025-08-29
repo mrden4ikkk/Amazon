@@ -27,3 +27,4 @@ variable "elastic_ip_allocation_id" {
   type    = string
   default = "eipalloc-04a4fdad93927c121"
 }
+
