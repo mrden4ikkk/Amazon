@@ -120,22 +120,6 @@ resource "aws_s3_bucket_versioning" "jenkins_backup_versioning" {
   }
 }
 
-###############
-
-#resource "null_resource" "upload_jenkins_backup" {
-#  triggers = {
-#    archive_path = "${path.module}/jenkins_pipelines.tar.gz"
-#    timestamp    = timestamp()
-#  }
-
-#  provisioner "local-exec" {
-#    command = <<EOT
-#      echo "Uploading Jenkins backup to S3..."
-#      aws s3 cp ${path.module}/jenkins_pipelines.tar.gz \
-#      s3://jenkins-backup-den-2025/jenkins_pipelines_${timestamp()}.tar.gz
-#    EOT
-#  }
-#}
 
 resource "null_resource" "upload_jenkins_backup" {
   triggers = {

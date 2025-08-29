@@ -7,7 +7,6 @@ sudo ./aws/install
 
 rm -rf awscliv2.zip aws/
 
-
 sudo apt -y update
 sudo apt install -y openjdk-17-jre openjdk-17-jdk
 
@@ -18,7 +17,6 @@ sudo apt -y update
 sudo apt install -y jenkins
 sudo systemctl start jenkins
 sudo systemctl enable jenkins
-
 
 sudo apt-get -y update
 sudo apt-get install -y ca-certificates curl
@@ -31,7 +29,6 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.
 sudo apt-get -y update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo systemctl enable docker
-
 
 sudo usermod -aG docker jenkins
 sudo usermod -aG adm jenkins
@@ -126,4 +123,3 @@ aws s3 cp "s3://${BUCKET_NAME}/${ARCHIVE_NAME}" "$LOCAL_PATH"
   sudo chown -R jenkins:jenkins "$JENKINS_HOME"
 
   sudo systemctl start jenkins
-
