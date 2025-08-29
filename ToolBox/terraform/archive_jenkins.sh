@@ -55,8 +55,10 @@
 
 #!/bin/bash
 
+sudo systemctl stop jenkins
+
 # === Шлях до Jenkins-папки ===
-JENKINS_HOME="$HOME/diploma/Amazon/ToolBox/jenkins"
+JENKINS_HOME="/var/lib/jenkins"
 ARCHIVE_NAME="$HOME/diploma/Amazon/ToolBox/terraform/jenkins_pipelines.tar.gz"
 
 # === Перевірка наявності папки ===

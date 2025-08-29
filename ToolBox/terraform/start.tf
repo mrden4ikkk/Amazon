@@ -5,13 +5,20 @@ provider "aws" {
   secret_key = var.aws_secret_key
 }
 
+resource "aws_iam_instance_profile" "jenkins_profile" {
+  name = "JenkinsInstanceProfile"
+  role = "JenkinsRestoreRole" // назва ролі для S3
+}
+
+
 // Create EC2 instance
 resource "aws_instance" "EC2-Instance" {
   availability_zone      = "eu-north-1a"
   ami                    = "ami-08eb150f611ca277f"
-  instance_type          = "t3.medium"
+  instance_type          = "t3.large"
   key_name               = var.key_name
 
+  iam_instance_profile = aws_iam_instance_profile.jenkins_profile.name
   vpc_security_group_ids = [aws_security_group.DefaultTerraformSG.id]
 
   // Create main disk
@@ -30,10 +37,10 @@ resource "aws_instance" "EC2-Instance" {
   user_data = file("files/install_apps.sh")
 }
 
-// Create Elastic IP
-resource "aws_eip" "jenkins_eip" {
-  domain = "vpc"
-}
+#// Create Elastic IP
+#resource "aws_eip" "jenkins_eip" {
+#  domain = "vpc"
+#}
 
 resource "aws_eip_association" "eip_assoc" {
   instance_id   = aws_instance.EC2-Instance.id
@@ -115,17 +122,32 @@ resource "aws_s3_bucket_versioning" "jenkins_backup_versioning" {
 
 ###############
 
+#resource "null_resource" "upload_jenkins_backup" {
+#  triggers = {
+#    archive_path = "${path.module}/jenkins_pipelines.tar.gz"
+#    timestamp    = timestamp()
+#  }
+
+#  provisioner "local-exec" {
+#    command = <<EOT
+#      echo "Uploading Jenkins backup to S3..."
+#      aws s3 cp ${path.module}/jenkins_pipelines.tar.gz \
+#      s3://jenkins-backup-den-2025/jenkins_pipelines_${timestamp()}.tar.gz
+#    EOT
+#  }
+#}
+
 resource "null_resource" "upload_jenkins_backup" {
   triggers = {
-    archive_path = "${path.module}/jenkins_pipelines.tar.gz"
-    timestamp    = timestamp()
+    always_run = "${timestamp()}" // просто щоб ресурс завжди виконувався
   }
 
   provisioner "local-exec" {
     command = <<EOT
-      echo "Uploading Jenkins backup to S3..."
+      echo "Uploading Jenkins backup to S3 with fixed name..."
       aws s3 cp ${path.module}/jenkins_pipelines.tar.gz \
-      s3://jenkins-backup-den-2025/jenkins_pipelines_${timestamp()}.tar.gz
+      s3://jenkins-backup-den-2025/jenkins_pipelines.tar.gz --region eu-north-1
     EOT
   }
 }
+

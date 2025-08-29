@@ -16,3 +16,4 @@ crash.log
 
 # Архіви Jenkins або інші .tar.gz
 *.tar.gz
+*.tar.xz

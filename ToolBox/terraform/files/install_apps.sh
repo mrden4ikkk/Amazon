@@ -1,7 +1,13 @@
 #!/bin/bash
 
-################### Install Jenkins ######################
-echo "🔧 Встановлення Jenkins..."
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo apt update && sudo apt install unzip -y
+unzip awscliv2.zip
+sudo ./aws/install
+
+rm -rf awscliv2.zip aws/
+
+
 sudo apt -y update
 sudo apt install -y openjdk-17-jre openjdk-17-jdk
 
@@ -13,8 +19,7 @@ sudo apt install -y jenkins
 sudo systemctl start jenkins
 sudo systemctl enable jenkins
 
-##################### Install Docker ######################
-echo "🐳 Встановлення Docker..."
+
 sudo apt-get -y update
 sudo apt-get install -y ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
@@ -27,40 +32,15 @@ sudo apt-get -y update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo systemctl enable docker
 
-######################## Setup ##########################
-echo "🔧 Налаштування прав Jenkins..."
+
 sudo usermod -aG docker jenkins
 sudo usermod -aG adm jenkins
 sudo systemctl restart jenkins
 sudo mkdir /opt/mssql
 sudo chmod 777 /opt/mssql
 
-################### Restore Jenkins from S3 ########################
-echo "📦 Встановлення AWS CLI та відновлення Jenkins..."
-BUCKET_NAME="jenkins-backup-den-2025"
-ARCHIVE_NAME="jenkins_pipelines.tar.gz"
-LOCAL_PATH="/tmp/${ARCHIVE_NAME}"
 
-sudo apt install -y awscli
-
-echo "📥 Завантаження Jenkins архіву з S3..."
-aws s3 cp "s3://${BUCKET_NAME}/${ARCHIVE_NAME}" "$LOCAL_PATH"
-
-if [ -f "$LOCAL_PATH" ]; then
-  echo "🔄 Відновлення Jenkins з архіву..."
-  sudo systemctl stop jenkins
-  sudo rm -rf /var/lib/jenkins/*
-  sudo tar -xpf "$LOCAL_PATH" -C /var/lib/jenkins/
-  sudo chown -R jenkins:jenkins /var/lib/jenkins
-  sudo systemctl start jenkins
-  echo "✅ Jenkins успішно відновлено"
-else
-  echo "⚠️ Архів не знайдено: $LOCAL_PATH"
-fi
-
-################### Unlock Jenkins ###########################
-echo "🔓 Створення адміністратора Jenkins..."
-url="http://13.50.23.123:8080"
+url="http://51.21.231.23:8080"
 password=$(sudo cat /var/lib/jenkins/secrets/initialAdminPassword)
 
 username="master"
@@ -84,8 +64,7 @@ curl -X POST -u "admin:$password" "$url/setupWizard/createAdminUser" \
 
 sudo systemctl restart jenkins
 
-################### Install Plugins ###########################
-echo "📦 Встановлення рекомендованих плагінів..."
+
 cookie_jar="$(mktemp)"
 full_crumb=$(curl -u "$username:$new_password" --cookie-jar "$cookie_jar" "$url/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)")
 arr_crumb=(${full_crumb//:/ })
@@ -102,9 +81,8 @@ curl -X POST -u "$username:$new_password" "$url/pluginManager/installPlugins" \
 
 sudo systemctl restart jenkins
 
-################### Configure Jenkins URL ###########################
-echo "🌐 Конфігурація root URL Jenkins..."
-url_urlEncoded=$(python3 -c "import urllib.parse; print(urllib.parse.quote('http://13.50.23.123:8080', safe=''))")
+
+url_urlEncoded=$(python3 -c "import urllib.parse; print(urllib.parse.quote('http://51.21.231.23:8080', safe=''))")
 
 cookie_jar="$(mktemp)"
 full_crumb=$(curl -u "$username:$new_password" --cookie-jar "$cookie_jar" "$url/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)")
@@ -120,9 +98,32 @@ curl -X POST -u "$username:$new_password" "$url/setupWizard/configureInstance" \
   --cookie "$cookie_jar" \
   --data-raw "rootUrl=${url_urlEncoded}%2F&Jenkins-Crumb=$only_crumb&json=%7B%22rootUrl%22%3A%20%22${url_urlEncoded}%2F%22%2C%20%22Jenkins-Crumb%22%3A%20%22$only_crumb%22%7D"
 
-################### Finalize Setup ###########################
-echo "✅ Завершення інсталяції Jenkins..."
+
 sudo bash -c 'echo current > /var/lib/jenkins/jenkins.install.InstallUtil.lastExecVersion'
 sudo bash -c 'echo current > /var/lib/jenkins/jenkins.install.UpgradeWizard.state'
 sudo chown jenkins:jenkins /var/lib/jenkins/jenkins.install.*
 sudo systemctl restart jenkins
+
+
+BUCKET_NAME="jenkins-backup-den-2025"
+ARCHIVE_NAME="jenkins_pipelines.tar.gz"
+LOCAL_PATH="/tmp/${ARCHIVE_NAME}"
+JENKINS_HOME="/var/lib/jenkins"
+
+
+until aws s3 ls "s3://${BUCKET_NAME}/${ARCHIVE_NAME}" &> /dev/null; do
+  sleep 5
+done
+
+
+aws s3 cp "s3://${BUCKET_NAME}/${ARCHIVE_NAME}" "$LOCAL_PATH"
+
+  sudo systemctl stop jenkins
+
+  sudo rm -rf "${JENKINS_HOME:?}/"*
+
+  sudo tar -xpf "$LOCAL_PATH" -C "$JENKINS_HOME"
+  sudo chown -R jenkins:jenkins "$JENKINS_HOME"
+
+  sudo systemctl start jenkins
+
