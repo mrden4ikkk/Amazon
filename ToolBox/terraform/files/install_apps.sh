@@ -37,7 +37,7 @@ sudo mkdir /opt/mssql
 sudo chmod 777 /opt/mssql
 
 
-url="http://51.21.231.23:8080"
+url="http://13.49.135.65:8080"
 password=$(sudo cat /var/lib/jenkins/secrets/initialAdminPassword)
 
 username="master"
@@ -79,7 +79,7 @@ curl -X POST -u "$username:$new_password" "$url/pluginManager/installPlugins" \
 sudo systemctl restart jenkins
 
 
-url_urlEncoded=$(python3 -c "import urllib.parse; print(urllib.parse.quote('http://51.21.231.23:8080', safe=''))")
+url_urlEncoded=$(python3 -c "import urllib.parse; print(urllib.parse.quote('http://13.49.135.65:8080', safe=''))")
 
 cookie_jar="$(mktemp)"
 full_crumb=$(curl -u "$username:$new_password" --cookie-jar "$cookie_jar" "$url/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,%22:%22,//crumb)")

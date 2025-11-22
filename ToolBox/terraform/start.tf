@@ -37,10 +37,10 @@ resource "aws_instance" "EC2-Instance" {
   user_data = file("files/install_apps.sh")
 }
 
-#// Create Elastic IP
-#resource "aws_eip" "jenkins_eip" {
-#  domain = "vpc"
-#}
+// Create Elastic IP
+resource "aws_eip" "jenkins_eip" {
+  domain = "vpc"
+}
 
 resource "aws_eip_association" "eip_assoc" {
   instance_id   = aws_instance.EC2-Instance.id
@@ -134,4 +134,3 @@ resource "null_resource" "upload_jenkins_backup" {
     EOT
   }
 }
-

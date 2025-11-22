@@ -25,6 +25,6 @@ variable "key_name" {
 
 variable "elastic_ip_allocation_id" {
   type    = string
-  default = "eipalloc-04a4fdad93927c121"
+  default = "eipalloc-0b7a880b8b9a98bde"
 }
 
